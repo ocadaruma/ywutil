@@ -1,0 +1,5 @@
+rootProject.name = 'ywutil'
+
+include ':core'
+include ':example'
+include ':benchmark'

@@ -1,0 +1,124 @@
+buildscript {
+    ext {
+        repos = {
+            mavenCentral()
+            jcenter()
+            maven {
+                url 'https://plugins.gradle.org/m2/'
+            }
+        }
+
+        lombokVersion = '1.18.8'
+    }
+
+    repositories repos
+
+    dependencies {
+        classpath 'me.champeau.gradle:jmh-gradle-plugin:0.4.8'
+    }
+}
+
+allprojects {
+    group 'com.mayreh'
+    version '0.1.0-SNAPSHOT'
+}
+
+subprojects {
+    apply plugin: 'java'
+
+    repositories repos
+
+    dependencies {
+        testCompileOnly "org.projectlombok:lombok:$lombokVersion"
+        testAnnotationProcessor "org.projectlombok:lombok:$lombokVersion"
+
+        testImplementation 'junit:junit:4.12'
+        testImplementation 'org.assertj:assertj-core:3.11.1'
+    }
+
+    test {
+        testLogging {
+            events 'standard_out', 'standard_error'
+            exceptionFormat 'full'
+        }
+    }
+}
+
+gradle.taskGraph.whenReady { taskGraph ->
+    if (taskGraph.allTasks.any { it instanceof Sign }) {
+        def password = System.console().readPassword("PGP Private Key Password: ")
+        project(':core') { ext."signing.password" = new String(password) }
+    }
+}
+
+project(':core') {
+    apply plugin: 'maven'
+    apply plugin: 'signing'
+
+    if (!project.hasProperty('sonatypeUsername')) {
+        ext.sonatypeUsername = ''
+    }
+    if (!project.hasProperty('sonatypePassword')) {
+        ext.sonatypePassword = ''
+    }
+
+    task javadocJar(type: Jar) {
+        classifier = 'javadoc'
+        from javadoc
+    }
+
+    task sourcesJar(type: Jar) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    artifacts {
+        archives javadocJar, sourcesJar
+    }
+
+    signing {
+        sign configurations.archives
+    }
+
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                    authentication(userName: sonatypeUsername, password: sonatypePassword)
+                }
+
+                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                    authentication(userName: sonatypeUsername, password: sonatypePassword)
+                }
+
+                pom.project {
+                    name 'ywutil'
+                    packaging 'jar'
+                    description 'A Java HyperMinHash implementation'
+                    url 'https://github.com/ocadaruma/ywutil'
+
+                    scm {
+                        connection 'scm:git:git@github.com:ocadaruma/ywutil.git'
+                        url 'git@github.com:ocadaruma/ywutil.git'
+                    }
+
+                    licenses {
+                        license {
+                            name 'BSD 3-Clause License'
+                            url 'https://raw.githubusercontent.com/ocadaruma/ywutil/master/LICENSE'
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id 'ocadaruma'
+                            name 'Haruki Okada'
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,5 @@
+apply plugin: 'me.champeau.gradle.jmh'
+
+dependencies {
+    implementation project(':core')
+}
