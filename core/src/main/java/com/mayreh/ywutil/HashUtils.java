@@ -3,7 +3,7 @@ package com.mayreh.ywutil;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-public class Utils {
+public class HashUtils {
     /*
      * 64 bit version of MurmurHash2
      */

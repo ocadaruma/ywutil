@@ -7,14 +7,14 @@ import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class UtilsTest {
+public class HashUtilsTest {
 
     @Test
     public void testMurmurHash3x64128() {
         byte[] data = "Lorem ipsum dolor sit amet, consectetur adipisicing elit"
                 .getBytes(StandardCharsets.UTF_8);
 
-        byte[] result = Utils.murmurHash3x64128(data, 104729);
+        byte[] result = HashUtils.murmurHash3x64128(data, 104729);
         ByteBuffer buffer = ByteBuffer.wrap(result);
 
 

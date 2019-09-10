@@ -1,7 +1,5 @@
 package com.mayreh.ywutil;
 
-import java.util.BitSet;
-
 public class HyperMinHash {
     // constant for 0.5/ln(2)
     private static final double HLL_ALPHA_INF = 0.721347520444481703680;
@@ -34,7 +32,7 @@ public class HyperMinHash {
             maxPatLen = 1 << q;
         }
 
-        public static final Config DEFAULT = new Config(14, 5, 10);
+        public static final Config DEFAULT = new Config(14, 6, 10);
     }
 
     private final Config config;
@@ -50,15 +48,15 @@ public class HyperMinHash {
     }
 
     public void add(byte[] element) {
-        final long hash = Utils.murmurHash64A(element, 0xadc83b19);
+        final byte[] hash = HashUtils.murmurHash3x64128(element, 0xadc83b19);
 
-        new BitSet()
-
-        final int register = (int) (hash >>> (Long.SIZE - config.p));
-        final byte patLen = patLen(hash, config.p, config.q);
-
-        int rBits = (int)(hash >>> (Long.SIZE - (config.p + patLen + config.r)));
-        rBits &= (1 << config.r) - 1;
+        final BitMap bitmap = new BitMap(hash);
+        final int register = bitmap.getInt(0, config.p);
+        final byte patLen = (byte)bitmap.leadingZeros(config.p, config.q);
+        final int rBits = bitmap.getInt(config.p + patLen, config.r);
+//
+//        int rBits = (int)(hash >>> (Long.SIZE - (config.p + patLen + config.r)));
+//        rBits &= (1 << config.r) - 1;
 
         final int packed = rBits | (patLen << config.r);
 
