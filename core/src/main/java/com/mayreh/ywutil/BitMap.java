@@ -8,15 +8,15 @@ public class BitMap {
     }
 
     public int getInt(int bitIndex, int len) {
-        final int endBitIdx = bitIndex + len;
+        final int endBitIdx = bitIndex + len - 1;
 
         final int byteIdx = bitIndex / 8;
         final int endByteIdx = endBitIdx / 8;
 
         int result = 0;
 
-        // least significant byte index
-        final int lsb = 8 - (endBitIdx % 8);
+        // least significant byte
+        final int lsb = 7 - (endBitIdx % 8);
         result |= ((bytes[endByteIdx] & 0xff) >>> lsb);
 
         // rest
@@ -32,6 +32,34 @@ public class BitMap {
     }
 
     public int leadingZeros(int bitIndex, int len) {
-        return 0;
+        final int endBitIdx = bitIndex + len - 1;
+
+        final int byteIdx = bitIndex / 8;
+        final int endByteIdx = endBitIdx / 8;
+
+        int result = 0;
+
+        // most significant byte
+        final int msb = 8 - (bitIndex % 8);
+        for (int i = msb - 1; i >= 0; i--) {
+            if ((bytes[byteIdx] & (1 << i)) != 0) {
+                return result;
+            }
+            result++;
+            len--;
+        }
+
+        for (int i = byteIdx + 1; i <= endByteIdx; i++) {
+            final int offset = Math.min(len, 8);
+            for (int j = 0; j < offset; j++) {
+                if ((bytes[i] & (1 << (7 - j))) != 0) {
+                    return result;
+                }
+                result++;
+                len--;
+            }
+        }
+
+        return result;
     }
 }

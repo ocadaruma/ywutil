@@ -14,19 +14,20 @@ public class HashUtilsTest {
         byte[] data = "Lorem ipsum dolor sit amet, consectetur adipisicing elit"
                 .getBytes(StandardCharsets.UTF_8);
 
-        byte[] result = HashUtils.murmurHash3x64128(data, 104729);
-        ByteBuffer buffer = ByteBuffer.wrap(result);
+        final byte[] result = HashUtils.murmurHash3x64128(data, 104729);
+        final ByteBuffer buffer = ByteBuffer.wrap(result);
+        final String hex = Long.toHexString(buffer.getLong(0)) + Long.toHexString(buffer.getLong(8));
 
+        assertThat(hex).isEqualTo("6769dae0ba0f9ccf7e4bd221908cfc07");
+    }
 
-        System.out.print(Long.toHexString(buffer.getLong(0)));
-        System.out.println(Long.toHexString(buffer.getLong(8)));
-//        assertThat(result).isEqualTo(0x0920e0c1b7eeb261L);
-
+    @Test
+    public void testCard() {
         final HyperMinHash sketch = new HyperMinHash();
         sketch.add("-1".getBytes(StandardCharsets.UTF_8));
         System.out.println(sketch.cardinality());
         for (int i = 0; i < 10000000; i++) {
-            sketch.add(String.valueOf(i).getBytes(StandardCharsets.UTF_8));
+            sketch.add(String.valueOf(i * 4).getBytes(StandardCharsets.UTF_8));
         }
         System.out.println(sketch.cardinality());
     }

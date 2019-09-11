@@ -52,11 +52,8 @@ public class HyperMinHash {
 
         final BitMap bitmap = new BitMap(hash);
         final int register = bitmap.getInt(0, config.p);
-        final byte patLen = (byte)bitmap.leadingZeros(config.p, config.q);
-        final int rBits = bitmap.getInt(config.p + patLen, config.r);
-//
-//        int rBits = (int)(hash >>> (Long.SIZE - (config.p + patLen + config.r)));
-//        rBits &= (1 << config.r) - 1;
+        final int patLen = bitmap.leadingZeros(config.p, config.q) + 1;
+        final int rBits = bitmap.getInt(128 - config.r, config.r);
 
         final int packed = rBits | (patLen << config.r);
 
@@ -98,21 +95,6 @@ public class HyperMinHash {
 //
 //        return (long)(similarity(sketches) * merge(sketches).cardinality());
 //    }
-
-    private static byte patLen(long hash, int p, int q) {
-        byte patLen = 1;
-        long mask = 1L << (Long.SIZE - p - 1);
-
-        for (int i = 0; i < 1 << q; i++) {
-            if ((hash & mask) != 0) {
-                break;
-            }
-            mask >>>= 1;
-            patLen++;
-        }
-
-        return patLen;
-    }
 
     private static double tau(double x) {
         if (x == 0.0 ||  x == 1.0) {
