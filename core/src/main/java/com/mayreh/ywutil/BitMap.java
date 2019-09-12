@@ -14,11 +14,11 @@ public class BitMap {
         while(lenLeft > 0) {
             final int bitIndex = startIndex + lenLeft - 1;
             final int byteIndex = bitIndex / 8;
-            final int bitLen = bitIndex % 8;
+            final int bitLen = (bitIndex % 8) + 1;
 
             int b = bytes[byteIndex] & 0xff;
-            b >>>= (7 - bitLen);
-            b &= ((1 << Math.min(len, 8)) - 1);
+            b >>>= 8 - bitLen;
+            b &= (1 << Math.min(lenLeft, 8)) - 1;
             b <<= len - lenLeft;
 
             result |= b;

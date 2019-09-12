@@ -48,7 +48,7 @@ public class HyperMinHash {
     }
 
     public void add(byte[] element) {
-        final byte[] hash = HashUtils.murmurHash3x64128(element, 0xadc83b19);
+        final byte[] hash = HashUtils.murmurHash3x64128(element, 1337);
 
         final BitMap bitmap = new BitMap(hash);
         final int register = bitmap.getInt(0, config.p);
@@ -57,7 +57,9 @@ public class HyperMinHash {
 
         final int packed = rBits | (patLen << config.r);
 
-        registers[register] = Math.max(registers[register], packed);
+        if (packed > registers[register]) {
+            registers[register] = packed;
+        }
     }
 
     public long cardinality() {
