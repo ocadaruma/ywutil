@@ -39,7 +39,7 @@ public class HyperMinHash {
             hllBits = HASH_BITS - r;
         }
 
-        public static final Config DEFAULT = new Config(18, 6, 10);
+        public static final Config DEFAULT = new Config(14, 6, 10);
     }
 
     final Config config;
@@ -153,7 +153,7 @@ public class HyperMinHash {
             return 0;
         }
 
-        return (c - nE) / n;
+        return (c - nE) / (double)n;
     }
 
     public static long intersection(List<? extends HyperMinHash> sketches) {
@@ -175,11 +175,11 @@ public class HyperMinHash {
         for (int i = 1; i <= _2q; i++) {
             for (int j = 1; j <= _2r; j++) {
                 if (i != _2q) {
-                    double den = 1 << (p + r + i);
+                    double den = Math.pow(2, p + r + i);
                     b1 = (_2r + j) / den;
                     b2 = (_2r + j + 1) / den;
                 } else {
-                    double den = 1 << (p + r + i - 1);
+                    double den = Math.pow(2, p + r + i - 1);
                     b1 = j / den;
                     b2 = (j + 1) / den;
                 }
