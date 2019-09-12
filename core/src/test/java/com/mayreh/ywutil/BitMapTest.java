@@ -11,11 +11,6 @@ public class BitMapTest {
     @Test
     public void testGetInt() {
         // 00011111 10110000 00111110 00000011
-        //        1 10110000 00111110 0
-        // | bytes[3] >>> 7 & 11111111 << 0   18  24
-        // | bytes[2] >>> 0 & 11111111 << 1   17  16
-        // | bytes[1] >>> 0 & 11111111 << 9   9   8
-        // | bytes[0] >>> 0 & 00000001 << 17  1   7
         final BitMap bitmap = new BitMap(toBytes(0x1fb03e03));
 
         // 1111 101
@@ -40,6 +35,10 @@ public class BitMapTest {
         assertThat(bitmap.getInt(16, 4)).isEqualTo(3);
 
         // 1 10110000 00111110 0
+        // | bytes[3] >>> 7 & 11111111 << 0   18  24
+        // | bytes[2] >>> 0 & 11111111 << 1   17  16
+        // | bytes[1] >>> 0 & 11111111 << 9   9   8
+        // | bytes[0] >>> 0 & 00000001 << 17  1   7
         assertThat(bitmap.getInt(7, 18)).isEqualTo(221308);
 
         // full
