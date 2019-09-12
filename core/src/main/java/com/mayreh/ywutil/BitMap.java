@@ -7,25 +7,23 @@ public class BitMap {
         this.bytes = bytes;
     }
 
-    public int getInt(int bitIndex, int len) {
-        final int endBitIdx = bitIndex + len - 1;
-
-        final int byteIdx = bitIndex / 8;
-        final int endByteIdx = endBitIdx / 8;
-
+    public int getInt(int startIndex, int len) {
         int result = 0;
+        int lenLeft = len;
 
-        // least significant byte
-        final int lsb = 7 - (endBitIdx % 8);
-        result |= ((bytes[endByteIdx] & 0xff) >>> lsb);
+        while(lenLeft > 0) {
+            final int bitIndex = startIndex + lenLeft - 1;
+            final int byteIndex = bitIndex / 8;
+            final int bitLen = bitIndex % 8;
 
-        // rest
-        int bitOffset = endBitIdx % 8;
-        len -= bitOffset;
-        for (int i = endByteIdx - 1; i >= byteIdx; i--) {
-            result |= ((bytes[i] & ((1 << Math.min(len, 8)) - 1)) << bitOffset);
-            bitOffset += 8;
-            len -= 8;
+            int b = bytes[byteIndex] & 0xff;
+            b >>>= (7 - bitLen);
+            b &= ((1 << Math.min(len, 8)) - 1);
+            b <<= len - lenLeft;
+
+            result |= b;
+
+            lenLeft -= bitLen;
         }
 
         return result;
