@@ -42,8 +42,8 @@ public class HyperMinHash {
         public static final Config DEFAULT = new Config(14, 6, 10);
     }
 
-    final Config config;
-    final int[] registers;
+    private final Config config;
+    private final int[] registers;
 
     public HyperMinHash(Config config) {
         this.config = config;
